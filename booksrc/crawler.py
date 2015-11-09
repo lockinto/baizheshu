@@ -22,6 +22,7 @@ def nextpage(url):
 def requesthtml(url):
 	html=requests.get(url)
 	while (html.status_code != 200):
+		print "request fail."
 		html=requests.get(url)
 	else:
 		return html
@@ -76,6 +77,7 @@ def getbooks(fileobj,index,name,url):
 		bookname=bookname.replace(' ','')
 		bookname=bookname.replace('\n','')
 		fileobj.write('$书名：%s\n'%(bookname))
+		print ('书名：%s'%(bookname))
 		#author
 		#//*[@id="byline"]/span[1]/a
 		#//*[@id="divsinglecolumnminwidth"]/div[3]/span/a[1]
@@ -141,7 +143,7 @@ def getbooks(fileobj,index,name,url):
 if __name__ == '__main__':
 	#from 1 to 562
 	begin=1
-	end=2
+	end=110
 	index=0
 	name=''
 	url=''
