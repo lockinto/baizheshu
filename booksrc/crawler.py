@@ -56,6 +56,9 @@ def getbooks(fileobj,index,name,url):
 	fileobj.write ('#分类编号:%d\n'%(index))
 	fileobj.write ('#分类:%s\n'%(name))
 	selector=selector_gen(url)
+	while(selector==0):
+		print "Exception error! Try again."
+		selector=selector_gen(url)
 	booknum=0
 	while(1):
 		
@@ -70,8 +73,9 @@ def getbooks(fileobj,index,name,url):
 		else:
 			img=''
 		bookhtml=requesthtml(bookurl)
-		if (bookhtml==0):
-			continue
+		while(bookhtml==0):
+			print "Exception error! Try again."
+			bookhtml=requesthtml(bookurl)
 		bookselector=etree.HTML(bookhtml.text)
 		#bookname
 		bookname_prev=bookselector.xpath('//*[@id="productTitle"]/text()')
