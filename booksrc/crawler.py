@@ -20,15 +20,22 @@ def nextpage(url):
 	return url
 
 def requesthtml(url):
-	html=requests.get(url)
-	while (html.status_code != 200):
-		print "request fail."
+	try:
 		html=requests.get(url)
-	else:
-		return html
+		while (html.status_code != 200):
+			print "request fail."
+			html=requests.get(url)
+		else:
+			return html
+	except requests.exceptions.RequestException,ex:
+		print ex
+		return 0
+
 
 def selector_gen(url):
 	html=requesthtml(url)
+	if (html == 0):
+		return 0
 	selector=etree.HTML(html.text)
 	return selector
 
@@ -63,6 +70,8 @@ def getbooks(fileobj,index,name,url):
 		else:
 			img=''
 		bookhtml=requesthtml(bookurl)
+		if (bookhtml==0):
+			continue
 		bookselector=etree.HTML(bookhtml.text)
 		#bookname
 		bookname_prev=bookselector.xpath('//*[@id="productTitle"]/text()')
@@ -78,14 +87,6 @@ def getbooks(fileobj,index,name,url):
 		bookname=bookname.replace('\n','')
 		fileobj.write('$书名：%s\n'%(bookname))
 		print ('书名：%s'%(bookname))
-		#author
-		#//*[@id="byline"]/span[1]/a
-		#//*[@id="divsinglecolumnminwidth"]/div[3]/span/a[1]
-		#//*[@id="divsinglecolumnminwidth"]/div[3]/span/a[1]
-		#//*[@id="divsinglecolumnminwidth"]/div[3]/span/a
-		#//*[@id="divsinglecolumnminwidth"]/div[3]/span/a
-		#//*[@id="byline"]/span[1]/a
-		#//*[@id="byline"]/span/a
 		if (kindel==1):
 			author_prev=bookselector.xpath('//*[@id="divsinglecolumnminwidth"]/div[3]/span/a[1]/text()')
 			if (author_prev):
