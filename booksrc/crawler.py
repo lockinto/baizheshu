@@ -161,10 +161,10 @@ def getbooks(page):
 if __name__ == '__main__':
 	#from 1 to 562
 	begin=18
-	end=26
+	end=110
 	user='chenyaofo'
 	info=[]
-	os.mkdir(user)
+	# os.mkdir(user)
 	catalog=open('catalog.txt','r')
 	readme=open('./%s/readme'%(user),'w')
 	for index in range(begin,end+1):
