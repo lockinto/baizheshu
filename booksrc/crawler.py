@@ -75,8 +75,8 @@ def getbooks(page):
 		if (bookurl_prev):
 			bookurl='%s'%(bookurl_prev[0])
 		else:
-			bookfile.close()
-			readme.write('%d,success!\n'%(index))
+			fileobj.close()
+			bookcount.write('%d,success!\n'%(index))
 			break
 		img_prev=selector.xpath('//*[@id="result_%d"]/div/div/div/div[1]/div/div/a/img/@src'%(booknum))
 		if (img_prev):
@@ -146,8 +146,8 @@ def getbooks(page):
 			url=nextpage(url)
 
 		if (url==0):
-			bookfile.close()
-			readme.write('%d,success!\n'%(index))
+			fileobj.close()
+			bookcount.write('%d,success!\n'%(index))
 			break
 		else:
 			selector=selector_gen(url)
@@ -155,25 +155,40 @@ def getbooks(page):
 		print '已经成功抓取第%d分类的第%d本书。。。'%(index,booknum+1)
 		booknum=booknum+1
 
-
+def isin(lines,str):
+	for each in lines:
+		if str in each:
+			return 1
+	return 0
 
 
 if __name__ == '__main__':
 	#from 1 to 562
-	begin=18
+	begin=1
 	end=110
 	user='chenyaofo'
 	info=[]
 	# os.mkdir(user)
 	catalog=open('catalog.txt','r')
-	readme=open('./%s/readme'%(user),'w')
+	bookcount=open('./%s/bookcount'%(user),'r')
+	lines=bookcount.readlines()
+	bookcount.close()
+	bookcount=open('./%s/bookcount'%(user),'a')
 	for index in range(begin,end+1):
 		result=getinfo(catalog,index)
 		page=[index,result[0], result[1]]
-		info.append(page)
+		index_str="%s"%(index)
+		if (isin(lines,index_str)==1):
+			pass
+		else:
+			info.append(page)
 	catalog.close()
+	# for each in info:
+	# 	print each[0]
+	# 	print each[1]
+	# 	print each[2]
 	pool = ThreadPool(8)
 	results = pool.map(getbooks, info)
 	pool.close()
 	pool.join()
-	readme.close()
+	bookcount.close()
