@@ -77,6 +77,7 @@ def getbooks(page):
 		else:
 			fileobj.close()
 			bookcount.write('%d,success!\n'%(index))
+			bookcount.flush()
 			break
 		img_prev=selector.xpath('//*[@id="result_%d"]/div/div/div/div[1]/div/div/a/img/@src'%(booknum))
 		if (img_prev):
@@ -148,6 +149,7 @@ def getbooks(page):
 		if (url==0):
 			fileobj.close()
 			bookcount.write('%d,success!\n'%(index))
+			bookcount.flush()
 			break
 		else:
 			selector=selector_gen(url)
