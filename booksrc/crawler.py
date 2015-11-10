@@ -5,6 +5,8 @@ import requests
 import json
 import sys
 import re
+import time
+import os
 
 reload(sys)
 
@@ -21,9 +23,11 @@ def nextpage(url):
 
 def requesthtml(url):
 	try:
+		time.sleep(0.5)
 		html=requests.get(url)
 		while (html.status_code != 200):
 			print "request fail."
+			time.sleep(0.5)
 			html=requests.get(url)
 		else:
 			return html
@@ -52,7 +56,12 @@ def getinfo(fileobj,index):
 			return [name,url]
 			break
 
-def getbooks(fileobj,index,name,url):
+def getbooks(page):
+	index=page[0]
+	name=page[1]
+	url=page[2]
+	global user
+	fileobj=open('./%s/book%d'%(user,index),'w')
 	fileobj.write ('#分类编号:%d\n'%(index))
 	fileobj.write ('#分类:%s\n'%(name))
 	selector=selector_gen(url)
@@ -66,6 +75,8 @@ def getbooks(fileobj,index,name,url):
 		if (bookurl_prev):
 			bookurl='%s'%(bookurl_prev[0])
 		else:
+			bookfile.close()
+			readme.write('%d,success!\n'%(index))
 			break
 		img_prev=selector.xpath('//*[@id="result_%d"]/div/div/div/div[1]/div/div/a/img/@src'%(booknum))
 		if (img_prev):
@@ -135,6 +146,8 @@ def getbooks(fileobj,index,name,url):
 			url=nextpage(url)
 
 		if (url==0):
+			bookfile.close()
+			readme.write('%d,success!\n'%(index))
 			break
 		else:
 			selector=selector_gen(url)
@@ -147,17 +160,20 @@ def getbooks(fileobj,index,name,url):
 
 if __name__ == '__main__':
 	#from 1 to 562
-	begin=1
-	end=110
-	index=0
-	name=''
-	url=''
+	begin=18
+	end=26
+	user='chenyaofo'
+	info=[]
+	os.mkdir(user)
 	catalog=open('catalog.txt','r')
+	readme=open('./%s/readme'%(user),'w')
 	for index in range(begin,end+1):
 		result=getinfo(catalog,index)
-		name=result[0]
-		url=result[1]
-		bookfile=open('book%d'%(index),'w')
-		getbooks(bookfile,index,name,url)
-		bookfile.close()
+		page=[index,result[0], result[1]]
+		info.append(page)
 	catalog.close()
+	pool = ThreadPool(8)
+	results = pool.map(getbooks, info)
+	pool.close()
+	pool.join()
+	readme.close()
