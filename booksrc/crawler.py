@@ -23,7 +23,7 @@ def nextpage(url):
 
 def requesthtml(url):
 	try:
-		time.sleep(0.5)
+		time.sleep(1)
 		html=requests.get(url)
 		while (html.status_code != 200):
 			print "request fail."
@@ -32,8 +32,9 @@ def requesthtml(url):
 		else:
 			return html
 	except requests.exceptions.RequestException,ex:
-		print ex
-		return 0
+		print ex 
+                time.sleep(10)
+		return requesthtml(url)
 
 
 def selector_gen(url):
@@ -68,6 +69,9 @@ def getbooks(page):
 	while(selector==0):
 		print "Exception error! Try again."
 		selector=selector_gen(url)
+        if selector==0:
+            fileobj.close()
+            return 0
 	booknum=0
 	while(1):
 		
@@ -88,6 +92,9 @@ def getbooks(page):
 		while(bookhtml==0):
 			print "Exception error! Try again."
 			bookhtml=requesthtml(bookurl)
+                if (bookhtml==0):
+                    booknum = booknum + 1
+                    continue
 		bookselector=etree.HTML(bookhtml.text)
 		#bookname
 		bookname_prev=bookselector.xpath('//*[@id="productTitle"]/text()')
@@ -167,8 +174,8 @@ def isin(lines,str):
 if __name__ == '__main__':
 	#from 1 to 562
 	begin=1
-	end=110
-	user='chenyaofo'
+	end=300
+	user='part1'
 	info=[]
 	# os.mkdir(user)
 	catalog=open('catalog.txt','r')
@@ -189,7 +196,7 @@ if __name__ == '__main__':
 	# 	print each[0]
 	# 	print each[1]
 	# 	print each[2]
-	pool = ThreadPool(8)
+	pool = ThreadPool(2)
 	results = pool.map(getbooks, info)
 	pool.close()
 	pool.join()
