@@ -196,7 +196,7 @@ if __name__ == '__main__':
 	# 	print each[0]
 	# 	print each[1]
 	# 	print each[2]
-	pool = ThreadPool(2)
+	pool = ThreadPool(1)
 	results = pool.map(getbooks, info)
 	pool.close()
 	pool.join()
